@@ -4,7 +4,7 @@
 using namespace std;
 
 // Add one student
-void addStudents(vector <string> &studentsName){ //TC : O(n), SC : O(n) 
+void addStudents(vector <string> &studentsName){ //TC : O(n), SC : O(1) 
     string name;
     cout << "Enter the name of student : ";
     getline(cin, name);
