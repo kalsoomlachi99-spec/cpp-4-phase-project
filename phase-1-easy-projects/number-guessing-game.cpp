@@ -12,6 +12,8 @@ int getValidInt() {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
     return value;
 }
 
@@ -42,8 +44,9 @@ void selectDifficultyLevel(int &randNum, int &maxNum) {
 
 }
 
-void playGuessingGame(int guessNum, int randNum, int &attempts, int maxNum) {
+void playGuessingGame(int randNum, int &attempts, int maxNum) {
 
+    int guessNum;
     while (true) {
         cout << "Guess a Number: ";
         guessNum = getValidInt();
@@ -98,8 +101,8 @@ int main() {
         int randNum = 0, maxNum = 0;
         selectDifficultyLevel(randNum, maxNum);
 
-        int guessNum, attempts = 0;
-        playGuessingGame(guessNum, randNum, attempts, maxNum);
+        int attempts = 0;
+        playGuessingGame(randNum, attempts, maxNum);
 
         int scoreValue = calculateScore(attempts);
 
