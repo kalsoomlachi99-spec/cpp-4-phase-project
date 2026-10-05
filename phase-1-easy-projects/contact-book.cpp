@@ -1,13 +1,14 @@
 #include <iostream>
-#include <vector>
 #include <string>
 #include <limits>
+#include <map>
 using namespace std;
 
-int getValidInt() {
-
+int getValidInt()
+{
     int value;
-    while (!(cin >> value)) {
+    while (!(cin >> value))
+    {
         cout << "Invalid input. Please enter a valid number: ";
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -17,7 +18,8 @@ int getValidInt() {
     return value;
 }
 
-void showMenu(){
+void showMenu()
+{
     cout << " ====== Contact Book ====== " << endl;
 
     cout << " 1. Add Contact \n";
@@ -26,35 +28,40 @@ void showMenu(){
     cout << " 4. Search Contact \n";
     cout << " 5. Display Contact \n";
     cout << " 6. Exit \n";
-
 }
 
-void selectChoice(){
-    cout << "Enter your choice: ";
-    int choice = getValidInt();
+int selectChoice()
+{
+    cout << "Enter your choice (an integer between 1 and 6): ";
+    return getValidInt();
 }
 
-int linearSearch(vector <string>& names, string& targetName){
-    for (int i = 0; i < names.size(); i++){
-        if(names[i] == targetName) {
-            return i;
-        }
-    }
-    return -1;
-}
+void addContact(map<string, string> &contacts)
+{
+    string name, phoneNumber;
 
-void addContact(vector<string>& names, vector<string>& phoneNumbers, string& name, string& phoneNumber) {
     cout << "Enter name of contact: ";
     getline(cin, name);
-    names.push_back(name);
 
     cout << "Enter phone number of contact: ";
     getline(cin, phoneNumber);
-    phoneNumbers.push_back(phoneNumber);
+
+    if (contacts.find(name) != contacts.end()){
+        cout << name << " already exists. Use Update Contact to change the phone number. \n";
+        return;
+    }
+
+    contacts[name] = phoneNumber;
+
+    cout << "Contact added successfully! \n";
 }
 
-void deleteContact(vector<string>& names, vector<string>& phoneNumbers, string& name){
-    if(names.empty()){
+void deleteContact(map<string, string> &contacts)
+{
+    string name;
+
+    if (contacts.empty())
+    { // edge case
         cout << "No contact to delete \n";
         return;
     }
@@ -62,66 +69,186 @@ void deleteContact(vector<string>& names, vector<string>& phoneNumbers, string& 
     cout << "Which contact you want to delete (please enter exact name): ";
     getline(cin, name);
 
-    int index = linearSearch(names, name);
-
-    if(index != -1) {
-        names.erase(names.begin() + index);
-        phoneNumbers.erase(phoneNumbers.begin() + index);
-
+    if (contacts.find(name) != contacts.end())
+    {
+        contacts.erase(name);
         cout << "Deleted Successfully! \n";
-    } else {
+    }
+    else
+    {
         cout << "Invalid contact! \n";
     }
-    
 }
 
-void updateContact (vector <string>& names,vector<string>& phoneNumbers, string& name, string& phoneNumber){
-    cout << "Enter the exact name of contact you want to update: ";
-    cin >> name;
+void updateContact(map<string, string> &contacts)
+{ 
+    string oldName, oldPhoneNumber, newName, newPhoneNumber;
+    bool  updated = false;
 
-    cout << "Update name: ";
-    cout << "Update phone number: ";
-    
-}
+    if (contacts.empty()) {
+        cout << "No contacts to update.\n";
+        return;
+    }
 
-void chioceAction(const int &choice, vector <string>& names,vector<string>& phoneNumbers, string& name, string& phoneNumber){
-    switch (choice){
-        case 1: 
-            addContact(names, phoneNumbers, name, phoneNumber);
-            break;
-        case 2:
-            deleteContact(names, phoneNumbers, name);
-            break;
-        case 3:
-            updateContact(names, phoneNumbers, name, phoneNumber);
-            break;
-        case 4:
-            searchContact(names, phoneNumbers, name);
-            break;
-        case 5:
-            displayContact(names, phoneNumbers, name, phoneNumber);
-            break;
-        case 6:
-            exit(0);
-            break;
-        default:
-            cout << "Invalid choice! \n";
-            break;
+    cout << "What do you want to update? \n";
+
+    cout << " 1. Name \n";
+    cout << " 2. Phone number \n";
+    cout << " 3. Both \n";
+
+    cout << "Select your choice (Enter integer from 1 to 3): ";
+    int update = getValidInt();
+
+    switch (update)
+    {
+    case 1:
+        cout << "Enter the name of contact you want to update: ";
+        getline(cin, oldName);
+        if (contacts.find(oldName) != contacts.end())
+        {
+            oldPhoneNumber = contacts[oldName];
+            cout << "Enter new name: ";
+            getline(cin, newName);
+
+            if (contacts.find(newName) == contacts.end())
+            {
+                contacts.insert({newName, oldPhoneNumber});
+                contacts.erase(oldName);
+                updated = true;
+            } else {
+                cout << "Error: New name already exists! \n";
+            }
+
+        } else {
+            cout << "Contact doesn't exists. \n";
+        }
+
+        break;
+    case 2:
+        cout << "Enter the name of contact you want to update: ";
+        getline(cin, oldName);
+        if (contacts.find(oldName) != contacts.end())
+        {
+            cout << "Enter new phone number: ";
+            getline(cin, newPhoneNumber);
+            contacts[oldName] = newPhoneNumber;
+            updated = true;
+
+        }else {
+            cout << "Contact doesn't exists. \n";
+        }
+
+        break;
+    case 3:
+        cout << "Enter both the name and phone number of contact you want to update: ";
+        cout << "Name: ";
+        getline(cin, oldName);
+        cout << "Phone number: ";
+        getline(cin, oldPhoneNumber);
+        if (contacts.find(oldName) != contacts.end())
+        {
+            cout << "Enter new name: ";
+            getline(cin, newName);
+            cout << "Enter new phone number: ";
+            getline(cin, newPhoneNumber);
+            if (contacts.find(newName) == contacts.end()) {
+                contacts.insert({newName, newPhoneNumber});
+                contacts.erase(oldName);
+                updated = true;
+            } else {
+                cout << "New name already exists. \n";
+            }        
+        } else {
+            cout << "Contact doesn't exist. \n";
+        }
+
+        break;
+    default:
+        cout << "Invalid choice! \n";
+    }
+
+    if (updated) {
+        cout << "Contact updated successfully! \n";
     }
 }
 
-int main() {
-    
+void searchContact(const map<string, string> &contacts)
+{
+    string name;
+
+    if (contacts.empty()){
+        cout << "No contacts available. Please add a contact first.\n";
+        return;
+    }
+
+    cout << "Enter name of contact you want to search: ";
+    getline(cin, name);
+
+    auto it = contacts.find(name);
+
+    if (it != contacts.end()) {
+        cout << it->first << ": " << it->second << endl;
+    } else {
+        cout << "Contact not found." << endl;
+    }
+}
+
+void displayContact(const map<string, string> &contacts)
+{
+    if (contacts.empty()) {
+    cout << "No contacts available.\n";
+    return;
+    }
+
+    cout << "Displaying Contacts... \n";
+    for (auto p : contacts) {
+        cout << p.first << ": " << p.second << endl;
+    }
+}
+void choiceAction(int choice, map<string, string> &contacts)
+{
+    // string name , phoneNumer;
+    switch (choice)
+    {
+    case 1:
+        addContact(contacts);
+        break;
+    case 2:
+        deleteContact(contacts);
+        break;
+    case 3:
+        updateContact(contacts);
+        break;
+    case 4:
+        searchContact(contacts);
+        break;
+    case 5:
+        displayContact(contacts);
+        break;
+    case 6:
+        cout << "Good Bye! \n";
+        break;
+    default:
+        cout << "Invalid choice! \n";
+        break;
+    }
+}
+
+int main()
+{
+
     /*C++ 4 phase roadmap - phase 1: Easy Projects - Project4: Contact Book Implementation*/
 
-    // Step 1: Store names  and phone numbers using vectors
-    vector<string> names;
-    vector<string> phoneNumbers;
-    string name, phoneNumber;
-    int choice;
-    
-    showMenu();
+    map<string, string> contacts; // Store names and phone numbers using a map
 
-    
+    int choice;
+    do {
+        showMenu();
+        choice = selectChoice();
+
+        choiceAction(choice, contacts);
+
+    } while (choice != 6);
+
     return 0;
 }
